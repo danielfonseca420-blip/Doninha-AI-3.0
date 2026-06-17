@@ -1,0 +1,52 @@
+# Configuração do Modelo Híbrido de LLM
+# Carregada por config_loader.load_config()
+
+# Banco de conhecimento: arquivo JSON com termo -> grau [0,1]. Se vazio, usa SEED interno.
+knowledge_base:
+  path: "data/train_all.json"   # ex: data/train_all.json
+  chroma_path: ""  # ex: meu_vector_db — se preenchido, enriquece KB com RAG
+
+# Modelo neural L3 (avaliação de verdade)
+l3:
+  model_path: "truth_scoring_model.pt"
+  backbone: "bert-base-multilingual-cased"
+
+# Base teórica L4 (Russell)
+l4:
+  russell_concepts_path: "l4_russell_concepts.json"
+
+# Geração de resposta (L5): "ollama" | "template" | "custom_lm"
+generation:
+  provider: "ollama"  # ollama usa o modelo local Doninha8; template = só L4; custom_lm = EpistemicLanguageModel
+  ollama_model: "doninha8:latest"  # modelo local criado com Modelfile
+  ollama_host: "http://localhost:11434"  # URL do servidor Ollama
+
+# Refinamento da resposta final (L6): segundo prompt de escrita fluida
+finalization:
+  provider: "ollama"  # template = polimento interno; ollama = segundo prompt via Ollama
+  ollama_model: "doninha8:latest"
+  ollama_host: "http://localhost:11434"
+
+# Texto final definitivo (L7)
+l7:
+  provider: "ollama"
+  model: "doninha8:latest"
+  ollama_host: "http://localhost:11434"
+  custom_lm_path: ""
+
+# Agente de pesquisa (unificado ao pipeline)
+agent:
+  use_agent: false   # se true, usa busca Chroma + DuckDuckGo para enriquecer contexto
+  vector_db_path: "meu_vector_db"
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8000
+
+# Chat: número máximo de turnos no contexto
+chat:
+  max_turns_in_context: 10
+
+HSA_OVERRIDE_GFX_VERSION: 9.0.0
